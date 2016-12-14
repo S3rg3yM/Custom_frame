@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Custom_frame</string>
+    <string name="add_view">Add</string>
+    <string name="delete_view">Delete</string>
+</resources>
