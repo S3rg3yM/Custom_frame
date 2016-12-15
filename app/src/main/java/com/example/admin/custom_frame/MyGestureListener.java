@@ -13,19 +13,19 @@ public class MyGestureListener extends GestureDetector.SimpleOnGestureListener {
 
     @Override
     public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-        LogUtil.info(this, "onFling: " + e1.toString()+e2.toString());
+        LogUtil.info(this, "onFling: " + e1+e2);
         return true;
     }
 
     @Override
     public void onLongPress(MotionEvent e) {
-        LogUtil.info(this, "onLongPress: " + e.toString());
+        LogUtil.info(this, "onLongPress: " + e);
         super.onLongPress(e);
     }
 
     @Override
     public void onShowPress(MotionEvent e) {
-        LogUtil.info(this, "onShowPress: " + e.toString());
+        LogUtil.info(this, "onShowPress: " + e);
         super.onShowPress(e);
     }
 

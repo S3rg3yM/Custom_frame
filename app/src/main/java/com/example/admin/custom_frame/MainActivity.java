@@ -25,8 +25,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         frameParent = (FrameParent) findViewById(R.id.fp);
-        View view = new View(getBaseContext());
-        frameParent.addMobileView(view);
 
         btnAdd = (Button) findViewById(R.id.btn_add);
         btbDelete = (Button) findViewById(R.id.btn_del);
@@ -41,14 +39,15 @@ public class MainActivity extends AppCompatActivity {
         btbDelete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (frameParent.getChildCount()==0) return;
-                frameParent.removeViewAt(frameParent.getChildCount()-1);
+                if (frameParent.countMobileView()==0) return;
+//                frameParent.deleteMobileView(frameParent.countMobileView()-1);
+                frameParent.deleteMobileView(frameParent.getMobileViewByIndex(frameParent.countMobileView()-1));
             }
         });
     }
 
-    private View getMobileView() {
-        View view = new View(getBaseContext());
+    private MobileView getMobileView() {
+        MobileView view = new MobileView(getBaseContext());
         FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(300,200);
         view.setLayoutParams(params);
         view.setFocusable(false);
