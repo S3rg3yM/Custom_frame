@@ -1,7 +1,6 @@
 package com.example.admin.custom_frame;
 
 import android.content.Context;
-import android.support.v4.view.GestureDetectorCompat;
 import android.util.AttributeSet;
 import android.widget.FrameLayout;
 
@@ -24,7 +23,6 @@ public class MobileView extends FrameLayout implements ChildInterface{
     private void init(){
 
     }
-
 
     @Override
     public void setActive(boolean status) {

@@ -4,13 +4,9 @@ import android.content.Context;
 import android.support.v4.view.GestureDetectorCompat;
 import android.util.AttributeSet;
 import android.util.Pair;
-import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewManager;
 import android.widget.FrameLayout;
-
-import java.util.ArrayList;
 
 public class FrameParent extends FrameLayout implements View.OnTouchListener, ParentInterface {
 
@@ -19,6 +15,7 @@ public class FrameParent extends FrameLayout implements View.OnTouchListener, Pa
     private View imgDelete;
     private View imgResize;
     private Pair<Float, Float> oldCoordinate;
+    float oldX, oldY;
 
     private GestureDetectorCompat mDetector;
 
@@ -45,65 +42,117 @@ public class FrameParent extends FrameLayout implements View.OnTouchListener, Pa
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
         imgDelete = findViewById(R.id.imgDelete);
+        imgDelete.setOnTouchListener(this);
         imgDelete.setVisibility(GONE);
         imgResize = findViewById(R.id.imgResize);
+        imgResize.setOnTouchListener(this);
         imgResize.setVisibility(GONE);
     }
+
+
 
     @Override
     public boolean onTouch(View view, MotionEvent motionEvent) {
         //LogUtil.info(this, "Tag: "+view.getTag());
         if (view instanceof MobileView) {
-            switch (motionEvent.getAction()) {
-                case MotionEvent.ACTION_DOWN:
-                    if (touchView!=null ) {
-                        touchView.setActive(false);
-                    }
-                    touchView = (MobileView) view;
-                    touchView.setActive(true);
-                    removeView(touchView);
-                    addView(touchView);
-                    oldCoordinate = new Pair<>(motionEvent.getX(), motionEvent.getY());
+            if (actionMobileView((MobileView) view, motionEvent)) return true;
+            else return mDetector.onTouchEvent(motionEvent);
+        }
 
-                    imgDelete.setVisibility(VISIBLE);
-                    removeView(imgDelete);
-                    addView(imgDelete);
+        switch (view.getId()) {
+            case R.id.imgResize:
+                switch (motionEvent.getAction()){
+                    case MotionEvent.ACTION_DOWN:
 
-                    imgResize.setVisibility(VISIBLE);
-                    removeView(imgResize);
-                    addView(imgResize);
+                        oldX = view.getX();
+                        oldY = view.getY();
 
-                    return true;
-                case MotionEvent.ACTION_UP:
-                    //touchView = null;
-                    return true;
-                case MotionEvent.ACTION_MOVE:
-                    if (touchView != null) {
-                        float mX = motionEvent.getX() - oldCoordinate.first;
-                        float mY = motionEvent.getY() - oldCoordinate.second;
-
-                        touchView.setX(touchView.getX() + mX);
-                        touchView.setY(touchView.getY() + mY);
-
-                        oldCoordinate = new Pair<>(motionEvent.getX(), motionEvent.getY());
-                        //touchView.forceLayout();
-
-                        imgDelete.setX(touchView.getX() - imgDelete.getWidth() / 2);
-                        imgDelete.setY(touchView.getY() - imgDelete.getHeight() / 2);
-                        //imgDelete.forceLayout();
-                        imgResize.setX(touchView.getX() + touchView.getWidth() - imgResize.getWidth() / 2);
-                        imgResize.setY(touchView.getY() + touchView.getHeight() - imgResize.getHeight() / 2);
-
-                        touchView.forceLayout();
-//                touchView.setRotation(  - вращение
-//                imgDelete.getMeasuredWidth()
-//  -
+                        LogUtil.info(this,"imgResize_DOWN");
                         return true;
-                    }
-            }
+                    case MotionEvent.ACTION_UP:
+
+                        LogUtil.info(this,"imgResize_UP");
+                        return false;
+                    case MotionEvent.ACTION_MOVE:
+
+                        float differenceX = motionEvent.getX() - oldX;
+                        float differenceY = motionEvent.getY() - oldY;
+
+                        LogUtil.info(this, "differentX: " + differenceX);
+                        LogUtil.info(this, "differentY: " + differenceY);
+
+                        if(differenceX > 0 && differenceY > 0){
+
+//                            imgResize.setX(imgResize.getX() + differenceX);
+//                            imgResize.setY(imgResize.getY() + differenceY);
+                        }
+                        else if (differenceX > 0 && differenceY < 0){
+
+                        }
+                        else if (differenceX < 0 && differenceY > 0){
+
+                        }
+                        else if (differenceX < 0 && differenceY < 0){
+
+                        }
+
+                        LogUtil.info(this,"imgResize_MOVE");
+                        return false;
+                }
+                break;
         }
 
         return mDetector.onTouchEvent(motionEvent);
+    }
+
+    private boolean actionMobileView(MobileView view, MotionEvent motionEvent) {
+        switch (motionEvent.getAction()) {
+            case MotionEvent.ACTION_DOWN:
+                if (touchView!=null ) {
+                    touchView.setActive(false);
+                }
+                touchView = view;
+                touchView.setActive(true);
+                removeView(touchView);
+                addView(touchView);
+                oldCoordinate = new Pair<>(motionEvent.getX(), motionEvent.getY());
+
+                imgDelete.setVisibility(VISIBLE);
+                removeView(imgDelete);
+                addView(imgDelete);
+
+                imgResize.setVisibility(VISIBLE);
+                removeView(imgResize);
+                addView(imgResize);
+
+                return true;
+            case MotionEvent.ACTION_UP:
+                //touchView = null;
+                return true;
+            case MotionEvent.ACTION_MOVE:
+                if (touchView != null) {
+                    float mX = motionEvent.getX() - oldCoordinate.first;
+                    float mY = motionEvent.getY() - oldCoordinate.second;
+
+                    touchView.setX(touchView.getX() + mX);
+                    touchView.setY(touchView.getY() + mY);
+
+                    oldCoordinate = new Pair<>(motionEvent.getX(), motionEvent.getY());
+                    //touchView.forceLayout();
+
+                    imgDelete.setX(touchView.getX() - imgDelete.getWidth() / 2);
+                    imgDelete.setY(touchView.getY() - imgDelete.getHeight() / 2);
+                    //imgDelete.forceLayout();
+                    imgResize.setX(touchView.getX() + touchView.getWidth() - imgResize.getWidth() / 2);
+                    imgResize.setY(touchView.getY() + touchView.getHeight() - imgResize.getHeight() / 2);
+
+                    touchView.forceLayout();
+//                touchView.setRotation(  - вращение
+//                imgDelete.getMeasuredWidth()
+                    return true;
+                }
+        }
+        return false;
     }
 
     @Override
