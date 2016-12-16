@@ -54,13 +54,15 @@ public class FrameParent extends FrameLayout implements View.OnTouchListener, Pa
     @Override
     public boolean onTouch(View view, MotionEvent motionEvent) {
         //LogUtil.info(this, "Tag: "+view.getTag());
+        mDetector.onTouchEvent(motionEvent);
         if (view instanceof MobileView) {
-            if (actionMobileView((MobileView) view, motionEvent)) return true;
-            else return mDetector.onTouchEvent(motionEvent);
+            return actionMobileView((MobileView) view, motionEvent);
+            //else return mDetector.onTouchEvent(motionEvent);
         }
 
         switch (view.getId()) {
             case R.id.imgResize:
+
                 switch (motionEvent.getAction()){
                     case MotionEvent.ACTION_DOWN:
 
@@ -81,20 +83,31 @@ public class FrameParent extends FrameLayout implements View.OnTouchListener, Pa
                         LogUtil.info(this, "differentX: " + differenceX);
                         LogUtil.info(this, "differentY: " + differenceY);
 
-                        if(differenceX > 0 && differenceY > 0){
+                        int vHight = touchView.getLayoutParams().height;
+                        int vWidth = touchView.getLayoutParams().width;
 
-//                            imgResize.setX(imgResize.getX() + differenceX);
-//                            imgResize.setY(imgResize.getY() + differenceY);
+                        if(motionEvent.getX() > motionEvent.getAction() && motionEvent.getY() > motionEvent.getAction()){
+
+                            touchView.setLayoutParams(new LayoutParams(vWidth+10, vHight+10));
+
+                            LogUtil.info(this,"Increase Size View");
                         }
-                        else if (differenceX > 0 && differenceY < 0){
+                        else if (motionEvent.getX() < motionEvent.getAction() && motionEvent.getY() < motionEvent.getAction()){
+                            touchView.setLayoutParams(new LayoutParams(vWidth-10, vHight-10));
+
+
+                            LogUtil.info(this,"Decrease Size View");
+                        }
+                        else if (motionEvent.getX() < motionEvent.getAction() && motionEvent.getY() > motionEvent.getAction()){
+
+                            LogUtil.info(this,"Rotetion+ Size View");
+                        }
+                        else if (motionEvent.getX() > motionEvent.getAction() && motionEvent.getY() < motionEvent.getAction()){
+
+                            LogUtil.info(this,"Rotetion- Size View");
 
                         }
-                        else if (differenceX < 0 && differenceY > 0){
-
-                        }
-                        else if (differenceX < 0 && differenceY < 0){
-
-                        }
+                        touchView.forceLayout();
 
                         LogUtil.info(this,"imgResize_MOVE");
                         return false;
@@ -102,7 +115,7 @@ public class FrameParent extends FrameLayout implements View.OnTouchListener, Pa
                 break;
         }
 
-        return mDetector.onTouchEvent(motionEvent);
+        return false;
     }
 
     private boolean actionMobileView(MobileView view, MotionEvent motionEvent) {
@@ -133,11 +146,11 @@ public class FrameParent extends FrameLayout implements View.OnTouchListener, Pa
                 if (touchView != null) {
                     float mX = motionEvent.getX() - oldCoordinate.first;
                     float mY = motionEvent.getY() - oldCoordinate.second;
+                    oldCoordinate = new Pair<>(motionEvent.getX(), motionEvent.getY());
 
                     touchView.setX(touchView.getX() + mX);
                     touchView.setY(touchView.getY() + mY);
 
-                    oldCoordinate = new Pair<>(motionEvent.getX(), motionEvent.getY());
                     //touchView.forceLayout();
 
                     imgDelete.setX(touchView.getX() - imgDelete.getWidth() / 2);
@@ -145,6 +158,7 @@ public class FrameParent extends FrameLayout implements View.OnTouchListener, Pa
                     //imgDelete.forceLayout();
                     imgResize.setX(touchView.getX() + touchView.getWidth() - imgResize.getWidth() / 2);
                     imgResize.setY(touchView.getY() + touchView.getHeight() - imgResize.getHeight() / 2);
+
 
                     touchView.forceLayout();
 //                touchView.setRotation(  - вращение
